@@ -1,0 +1,23 @@
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Node
+node_modules/
+.pnpm-store/
+
+# Next.js
+apps/frontend/.next/
+apps/frontend/out/
+apps/frontend/next-env.d.ts
+
+# Environment
+.env
+.env.local
+*.env.local
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/

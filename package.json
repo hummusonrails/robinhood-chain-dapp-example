@@ -1,0 +1,21 @@
+{
+  "name": "robinhood-chain-index-baskets",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Onchain index baskets of tokenized stocks on Robinhood Chain",
+  "license": "MIT",
+  "scripts": {
+    "build:contracts": "forge build --root contracts",
+    "test:contracts": "forge test --root contracts --no-match-path 'test/fork/*'",
+    "test:fork": "forge test --root contracts --match-path 'test/fork/*' -vv",
+    "test": "pnpm run test:contracts",
+    "fmt:contracts": "forge fmt --root contracts",
+    "deploy:testnet": "scripts/deploy.sh testnet",
+    "deploy:local": "scripts/deploy.sh local",
+    "smoke": "scripts/smoke.sh",
+    "dev": "pnpm --filter frontend dev",
+    "build:frontend": "pnpm --filter frontend build",
+    "lint:frontend": "pnpm --filter frontend lint",
+    "check": "pnpm run build:contracts && pnpm run test:contracts && pnpm run build:frontend"
+  }
+}

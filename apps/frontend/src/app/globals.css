@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* palette lifted from the robinhood chain docs design system */
+@theme {
+  --color-rh-bg: #110e08;
+  --color-rh-surface: #1d1a14;
+  --color-rh-elevated: #35322d;
+  --color-rh-border: #35322d;
+  --color-rh-border-strong: #4d4a46;
+  --color-rh-lime: #ccff00;
+  --color-rh-lime-hover: #bef200;
+  --color-rh-text: #ffffff;
+  --color-rh-muted: #bfbfbf;
+  --color-rh-faint: #888784;
+  --color-rh-danger: #ea5121;
+  --font-sans: "Phonic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-rh-bg);
+  color: var(--color-rh-text);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-rh-lime);
+  color: var(--color-rh-bg);
+}

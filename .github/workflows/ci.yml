@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # fork tests hit the live mainnet rpc so they also run on a weekly schedule
+  # to catch drift in the real stock tokens and chainlink feeds
+  schedule:
+    - cron: "0 6 * * 2"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: contracts (build + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Check formatting
+        run: forge fmt --check --root contracts
+
+      - name: Build
+        run: forge build --root contracts
+
+      - name: Unit tests
+        run: forge test --root contracts --no-match-path 'test/fork/*' -vv
+
+  fork-tests:
+    name: contracts (mainnet fork)
+    # scheduled and manual only, public rpc calls are too flaky to gate prs on
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Fork tests against Robinhood Chain mainnet
+        run: forge test --root contracts --match-path 'test/fork/*' -vv
+
+  frontend:
+    name: frontend (build + lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint:frontend
+
+      - name: Build
+        run: pnpm run build:frontend
+
+  scripts:
+    name: scripts (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck
+        run: shellcheck scripts/*.sh
