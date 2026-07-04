@@ -21,3 +21,7 @@ apps/frontend/next-env.d.ts
 .DS_Store
 .idea/
 .vscode/
+
+# Vercel
+.vercel/
+.testnet-deployer.env
