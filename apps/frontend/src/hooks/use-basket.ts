@@ -50,6 +50,33 @@ export function useTotalValueUsd(basket: Address) {
   });
 }
 
+export function useBasketTotalSupply(basket: Address) {
+  return useReadContract({
+    address: basket,
+    abi: basketTokenAbi,
+    functionName: "totalSupply",
+    query: { refetchInterval: 15_000 },
+  });
+}
+
+export function useMaxPriceAge(basket: Address) {
+  return useReadContract({
+    address: basket,
+    abi: basketTokenAbi,
+    functionName: "maxPriceAge",
+  });
+}
+
+export function useQuoteRedeem(basket: Address, shares: bigint) {
+  return useReadContract({
+    address: basket,
+    abi: basketTokenAbi,
+    functionName: "quoteRedeem",
+    args: [shares],
+    query: { enabled: shares > 0n },
+  });
+}
+
 export function useBasketBalance(basket: Address) {
   const { address } = useAccount();
   return useReadContract({

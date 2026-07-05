@@ -18,6 +18,34 @@ export function useStockTokenSymbol(token: Address) {
   });
 }
 
+export function useStockTokenName(token: Address) {
+  return useReadContract({
+    address: token,
+    abi: stockTokenAbi,
+    functionName: "name",
+  });
+}
+
+export function useStockTokenDecimals(token: Address) {
+  return useReadContract({
+    address: token,
+    abi: stockTokenAbi,
+    functionName: "decimals",
+  });
+}
+
+// erc-8056 scaled balance for the connected account
+export function useBalanceOfUI(token: Address) {
+  const { address } = useAccount();
+  return useReadContract({
+    address: token,
+    abi: stockTokenAbi,
+    functionName: "balanceOfUI",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
+}
+
 export function useStockTokenBalance(token: Address) {
   const { address } = useAccount();
   return useReadContract({
@@ -85,5 +113,13 @@ export function useFeedDescription(feed: Address) {
     address: feed,
     abi: priceFeedAbi,
     functionName: "description",
+  });
+}
+
+export function useFeedDecimals(feed: Address) {
+  return useReadContract({
+    address: feed,
+    abi: priceFeedAbi,
+    functionName: "decimals",
   });
 }

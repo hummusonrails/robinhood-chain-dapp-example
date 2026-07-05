@@ -10,18 +10,22 @@ type Props = {
   token: Address;
   spender: Address;
   required: bigint;
+  onConfirmed?: (token: Address, symbol: string, hash: `0x${string}`) => void;
 };
 
 // one component token approval, hidden once the allowance covers the quote
-export function ApproveRow({ token, spender, required }: Props) {
+export function ApproveRow({ token, spender, required, onConfirmed }: Props) {
   const symbol = useStockTokenSymbol(token);
   const allowance = useAllowance(token, spender);
   const { approve, hash, isPending, isConfirming, isConfirmed, error } = useApprove();
 
   const refetchAllowance = allowance.refetch;
   useEffect(() => {
-    if (isConfirmed) refetchAllowance();
-  }, [isConfirmed, refetchAllowance]);
+    if (isConfirmed) {
+      refetchAllowance();
+      if (hash) onConfirmed?.(token, symbol.data ?? "token", hash);
+    }
+  }, [isConfirmed, refetchAllowance, hash, onConfirmed, token, symbol.data]);
 
   const approved = allowance.data !== undefined && allowance.data >= required;
   if (approved) {

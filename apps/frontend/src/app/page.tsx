@@ -1,30 +1,42 @@
 "use client";
 
-import { useState } from "react";
-import type { Address } from "viem";
-import { BasketPicker } from "@/components/basket-picker";
-import { BasketStats } from "@/components/basket-stats";
-import { ComponentTable } from "@/components/component-table";
-import { MintRedeem } from "@/components/mint-redeem";
-import { demoBasketAddress } from "@/config/contracts";
+import { WalkthroughProvider, useWalkthrough } from "@/components/walkthrough/context";
+import { StepTabs } from "@/components/walkthrough/step-tabs";
+import { LiveConsole } from "@/components/walkthrough/console";
+import { TestnetNotice } from "@/components/walkthrough/notice";
+import { StepTokens } from "@/components/walkthrough/steps/step-tokens";
+import { StepFeeds } from "@/components/walkthrough/steps/step-feeds";
+import { StepBasket } from "@/components/walkthrough/steps/step-basket";
+import { StepMint } from "@/components/walkthrough/steps/step-mint";
+import { StepRedeem } from "@/components/walkthrough/steps/step-redeem";
+
+function CurrentStep() {
+  const { step } = useWalkthrough();
+  switch (step) {
+    case 0:
+      return <StepTokens />;
+    case 1:
+      return <StepFeeds />;
+    case 2:
+      return <StepBasket />;
+    case 3:
+      return <StepMint />;
+    default:
+      return <StepRedeem />;
+  }
+}
 
 export default function Home() {
-  const [basket, setBasket] = useState<Address>(demoBasketAddress);
-
   return (
-    <div className="space-y-6">
-      <BasketPicker selected={basket} onSelect={setBasket} />
-      <BasketStats basket={basket} />
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <ComponentTable basket={basket} />
-        <MintRedeem basket={basket} />
+    <WalkthroughProvider>
+      <StepTabs />
+      <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_380px]">
+        <CurrentStep />
+        <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <TestnetNotice />
+          <LiveConsole />
+        </div>
       </div>
-      <p className="text-xs leading-relaxed text-rh-faint">
-        One basket share is always redeemable for a fixed amount of each
-        underlying Stock Token. Prices are read live from Chainlink feeds and
-        the basket never rebalances. It is a transparent, fully collateralized
-        wrapper, not managed exposure.
-      </p>
-    </div>
+    </WalkthroughProvider>
   );
 }
