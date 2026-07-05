@@ -72,9 +72,10 @@ export function StepTokens() {
           token that the faucet dispenses, read live from the chain.
         </p>
         <p>
-          The twist is corporate actions. When a 2-for-1 stock split doubles your
-          share count, raw ERC-20 balances stay exactly where they were, so every
-          integration keeps working untouched. The token implements{" "}
+          Corporate actions are where Stock Tokens differ from a plain ERC-20.
+          When a 2-for-1 stock split doubles your share count, raw ERC-20
+          balances stay exactly where they were, so every integration keeps
+          working. The token implements{" "}
           <strong className="text-rh-text">ERC-8056</strong>, the Scaled UI Amount
           extension: a <code className="font-mono text-rh-lime">uiMultiplier</code>{" "}
           that display layers multiply in. Underlying shares equal raw balance times

@@ -156,8 +156,9 @@ export function StepMint() {
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>
-          Minting is a two-part dance every ERC-20 protocol shares. First you grant
-          the basket an <strong className="text-rh-text">allowance</strong> on each
+          Minting has two parts, the same two every ERC-20 protocol uses. First
+          you grant the basket an{" "}
+          <strong className="text-rh-text">allowance</strong> on each
           component. Then a single{" "}
           <code className="font-mono text-rh-lime">mint(shares, to)</code> call pulls
           the exact backing amounts with <code className="font-mono">transferFrom</code>{" "}
@@ -165,10 +166,9 @@ export function StepMint() {
           under-collateralized.
         </p>
         <p>
-          One subtlety worth savoring: component amounts{" "}
-          <strong className="text-rh-text">round up</strong>, so every mint, even a
-          dust-sized one, pays its full share of the backing and the basket stays
-          fully collateralized.
+          Component amounts <strong className="text-rh-text">round up</strong>, so
+          every mint, even a dust-sized one, pays its full share of the backing
+          and the basket stays fully collateralized.
         </p>
       </div>
 

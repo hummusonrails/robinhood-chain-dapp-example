@@ -89,10 +89,10 @@ export function StepRedeem() {
           mint&apos;s round up, so the reserves can never be overdrawn.
         </p>
         <p>
-          This exit ramp is the whole trust model. There is no manager who can gate
-          withdrawals and no oracle dependency on the way out: redemption works even
-          while the price feeds are stale, because moving tokens should never depend
-          on quoting them.
+          Redemption is what makes the basket trustworthy. No one can gate
+          withdrawals, and there is no oracle dependency on the way out:
+          redemption works even while the price feeds are stale, because moving
+          tokens never depends on quoting them.
         </p>
       </div>
 

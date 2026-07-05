@@ -75,13 +75,12 @@ export function StepFeeds() {
           the same interface. Everything a consumer contract does is identical.
         </p>
         <p>
-          Equity feeds have a rhythm of their own: <strong className="text-rh-text">
-          markets keep hours</strong>. Stock feeds update 24 hours a day, 5 days a
-          week, so the staleness window belongs to the asset class. Size it for a
-          quiet weekend and pricing sails through Monday open. The basket accepts a{" "}
+          Stock feeds update 24 hours a day, 5 days a week, because the markets
+          they track close on weekends. Set the staleness window to match the
+          asset class. The basket accepts a{" "}
           <code className="font-mono text-rh-lime">maxPriceAge</code> at deployment
           and this one uses {maxPriceAge.data ? Number(maxPriceAge.data) / 86400 : 4}{" "}
-          days.
+          days, wide enough to cover a weekend.
         </p>
       </div>
 

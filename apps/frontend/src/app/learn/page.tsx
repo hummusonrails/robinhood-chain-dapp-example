@@ -115,7 +115,8 @@ export default function LearnPage() {
             Every feed read passes through one gate. A non-positive answer or an
             answer older than <Code>maxPriceAge</Code> reverts the pricing views,
             and only the pricing views. This basket uses 4 days because equity
-            feeds sleep on weekends, a number you should tune per asset class.
+            feeds pause over the weekend, and the right number depends on the
+            asset class.
           </p>
         </Prose>
         <CodeBlock id="read-price" />
@@ -186,9 +187,9 @@ export default function LearnPage() {
         <CodeBlock id="fork-setup" />
         <Prose>
           <p>
-            Inside a fork test, <Code>deal</Code> conjures real Stock Token
-            balances for a test account, so mint and redeem run against the
-            actual mainnet bytecode without owning a single token.
+            Inside a fork test, <Code>deal</Code> gives a test account real
+            Stock Token balances, so mint and redeem run against the actual
+            mainnet bytecode without owning a single token.
           </p>
         </Prose>
         <CodeBlock id="fork-mint" />
@@ -244,10 +245,9 @@ export default function LearnPage() {
               3 · first come, first served, no priority auction
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
-              The sequencer orders transactions by arrival time. Everyone pays
-              the same fair price for the same position in line, sandwich
-              attacks lose their economics, and fee estimation becomes simple
-              and predictable.
+              The sequencer orders transactions by arrival time, and paying more
+              gas does not change your place in line. That removes the economics
+              behind sandwich attacks and makes fee estimation predictable.
             </p>
           </div>
           <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
@@ -267,11 +267,10 @@ export default function LearnPage() {
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
               Equity feeds update 24 hours a day, five days a week, matching the
-              markets they track. Two patterns make this a joy to work with:
-              size your staleness window per asset class (this basket uses 4
-              days, so weekends pass without a hiccup), and keep transfers
-              independent of pricing, which is exactly how{" "}
-              <Code>BasketToken</Code> splits its functions.
+              markets they track. Set the staleness window per asset class, this
+              basket uses 4 days to cover weekends, and keep transfers
+              independent of pricing, which is how <Code>BasketToken</Code>{" "}
+              splits its functions.
             </p>
           </div>
         </div>
