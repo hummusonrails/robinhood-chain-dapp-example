@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { Address } from "viem";
+import { formatUnits, type Address } from "viem";
 import { useAccount } from "wagmi";
 import {
   useBasketBalance,
@@ -36,7 +36,7 @@ export function StepRedeem() {
   const { logEvent } = useWalkthrough();
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
-  const [input, setInput] = useState("0.1");
+  const [input, setInput] = useState("");
 
   const onCorrectChain = useOnCorrectChain();
   const shares = toShares(input);
@@ -108,12 +108,25 @@ export function StepRedeem() {
           <label className="block text-xs uppercase tracking-wide text-rh-faint">
             Shares to redeem
           </label>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            inputMode="decimal"
-            className="mt-1 w-full rounded-lg border border-rh-border-strong bg-rh-bg px-3 py-2 font-mono text-lg outline-none focus:border-rh-lime"
-          />
+          <div className="mt-1 flex gap-2">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              inputMode="decimal"
+              placeholder="0.0"
+              className="w-full rounded-lg border border-rh-border-strong bg-rh-bg px-3 py-2 font-mono text-lg outline-none focus:border-rh-lime"
+            />
+            <button
+              onClick={() =>
+                balance.data !== undefined &&
+                setInput(formatUnits(balance.data, 18))
+              }
+              disabled={!balance.data}
+              className="rounded-lg border border-rh-border-strong px-4 font-mono text-xs text-rh-muted transition-colors hover:border-rh-lime hover:text-rh-lime disabled:opacity-40"
+            >
+              Max
+            </button>
+          </div>
           <p className="mt-1 text-xs text-rh-faint">
             You hold {formatShares(balance.data)} shares.
           </p>
