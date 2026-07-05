@@ -12,6 +12,7 @@ import {
   useUiMultiplier,
 } from "@/hooks/use-stock-token";
 import { demoBasketAddress } from "@/config/contracts";
+import { useMounted } from "@/hooks/use-mounted";
 import { formatShares } from "@/lib/format";
 import { useWalkthrough } from "../context";
 import { StepShell } from "../step-shell";
@@ -22,6 +23,8 @@ const DOCS_URL = "https://docs.robinhood.com/chain/stock-tokens/";
 export function StepTokens() {
   const { logEvent } = useWalkthrough();
   const { isConnected } = useAccount();
+  // ssr renders the disconnected copy so hydration matches after auto reconnect
+  const connected = useMounted() && isConnected;
   const components = useBasketComponents(demoBasketAddress);
   const token = components.data?.[0]?.token;
 
@@ -117,12 +120,12 @@ export function StepTokens() {
           },
           {
             field: "balanceOf",
-            value: isConnected ? formatShares(balance.data) : "connect a wallet",
+            value: connected ? formatShares(balance.data) : "connect a wallet",
             note: "Your raw balance. This is what contracts like the basket operate on.",
           },
           {
             field: "balanceOfUI",
-            value: isConnected ? formatShares(balanceUI.data) : "connect a wallet",
+            value: connected ? formatShares(balanceUI.data) : "connect a wallet",
             note: "Your balance times the multiplier, the number a brokerage UI would show.",
           },
         ]}

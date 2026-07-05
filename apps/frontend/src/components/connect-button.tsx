@@ -1,10 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useMounted } from "@/hooks/use-mounted";
 import { shortAddress } from "@/lib/format";
-
-const emptySubscribe = () => () => {};
 
 export function ConnectButton() {
   const { address, isConnected } = useAccount();
@@ -12,11 +10,7 @@ export function ConnectButton() {
   const { disconnect } = useDisconnect();
 
   // render the disconnected state on the server so hydration matches
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
+  const mounted = useMounted();
 
   if (mounted && isConnected && address) {
     return (
