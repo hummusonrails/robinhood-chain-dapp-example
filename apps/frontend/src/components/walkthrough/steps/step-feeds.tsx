@@ -64,6 +64,7 @@ export function StepFeeds() {
       kicker="oracles with market hours"
       title="Price feeds"
       activeActors={[3]}
+      actorNote="Only the Chainlink feed is read in this step. Nothing moves and no wallet is needed, price data is a free view call."
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>

@@ -84,6 +84,7 @@ export function StepBasket() {
       kicker="a transparent wrapper, not a fund"
       title="The basket"
       activeActors={[1, 2, 3]}
+      actorNote="The basket holds the Stock Tokens and reads every Chainlink feed to price one share. Your wallet is not involved until you mint."
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>

@@ -77,6 +77,7 @@ export function StepRedeem() {
       kicker="burn shares, withdraw the backing"
       title="Redeem"
       activeActors={[0, 1, 2]}
+      actorNote="Same cast as minting, and Chainlink stays grayed out on purpose: the exit never depends on the oracle, so redemption works even while feeds are stale."
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>

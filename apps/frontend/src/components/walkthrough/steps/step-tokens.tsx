@@ -59,6 +59,7 @@ export function StepTokens() {
       kicker="equities as ERC-20s"
       title="Stock Tokens"
       activeActors={[1]}
+      actorNote="Only the Stock Token contract is involved here. Everything on this page is a plain read call any contract or script could make."
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>

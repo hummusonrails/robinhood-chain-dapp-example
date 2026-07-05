@@ -152,6 +152,7 @@ export function StepMint() {
       kicker="deposit components, receive shares"
       title="Mint shares"
       activeActors={[0, 1, 2]}
+      actorNote="Your wallet, the Stock Tokens, and the basket. Chainlink is deliberately grayed out: minting moves tokens at the fixed composition and never reads a price."
     >
       <div className="space-y-3 text-sm leading-relaxed text-rh-muted">
         <p>

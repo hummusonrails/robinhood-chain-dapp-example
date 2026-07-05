@@ -9,10 +9,18 @@ type Props = {
   kicker: string;
   title: string;
   activeActors: number[];
+  actorNote: string;
   children: React.ReactNode;
 };
 
-export function StepShell({ index, kicker, title, activeActors, children }: Props) {
+export function StepShell({
+  index,
+  kicker,
+  title,
+  activeActors,
+  actorNote,
+  children,
+}: Props) {
   const { setStep } = useWalkthrough();
   const last = index === STEPS.length - 1;
 
@@ -25,7 +33,7 @@ export function StepShell({ index, kicker, title, activeActors, children }: Prop
         <h1 className="mt-1 text-3xl font-semibold">{title}</h1>
       </div>
       {children}
-      <FlowDiagram active={activeActors} />
+      <FlowDiagram active={activeActors} note={actorNote} />
       <div className="flex gap-3">
         {index > 0 && (
           <button
