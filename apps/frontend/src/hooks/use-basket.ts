@@ -8,6 +8,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { basketTokenAbi } from "@/abi/basket-token";
+import { activeChain } from "@/config/wagmi";
 
 export function useBasketMetadata(basket: Address) {
   const name = useReadContract({
@@ -120,6 +121,7 @@ export function useBasketWrite() {
         abi: basketTokenAbi,
         functionName: "mint",
         args: [shares, to],
+        chainId: activeChain.id,
       });
     },
     redeem(basket: Address, shares: bigint, to: Address) {
@@ -128,6 +130,7 @@ export function useBasketWrite() {
         abi: basketTokenAbi,
         functionName: "redeem",
         args: [shares, to],
+        chainId: activeChain.id,
       });
     },
     hash,

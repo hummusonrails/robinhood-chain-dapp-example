@@ -17,6 +17,7 @@ import { formatShares } from "@/lib/format";
 import { ApproveRow } from "@/components/approve-row";
 import { TxStatus } from "@/components/tx-status";
 import { ConnectButton } from "@/components/connect-button";
+import { NetworkGuard, useOnCorrectChain } from "@/components/network-guard";
 import { useWalkthrough } from "../context";
 import { StepShell } from "../step-shell";
 
@@ -57,6 +58,7 @@ export function StepMint() {
   const queryClient = useQueryClient();
   const [input, setInput] = useState("0.1");
 
+  const onCorrectChain = useOnCorrectChain();
   const shares = toShares(input);
   const components = useBasketComponents(demoBasketAddress);
   const quote = useQuoteMint(demoBasketAddress, shares);
@@ -161,7 +163,8 @@ export function StepMint() {
           <ConnectButton />
         </div>
       ) : (
-        <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
+        <div className="space-y-3 rounded-xl border border-rh-border bg-rh-surface p-4">
+          <NetworkGuard />
           <div className="flex flex-wrap gap-2">
             {components.data?.map((c, i) => (
               <BalanceChip
@@ -199,7 +202,7 @@ export function StepMint() {
             </p>
           )}
 
-          {shares > 0n && !anyShort && components.data && quote.data && (
+          {shares > 0n && !anyShort && onCorrectChain && components.data && quote.data && (
             <div className="mt-3 space-y-2">
               {components.data.map((c, i) => (
                 <ApproveRow
@@ -215,7 +218,7 @@ export function StepMint() {
 
           <button
             onClick={submit}
-            disabled={shares === 0n || anyShort || isPending || isConfirming}
+            disabled={shares === 0n || anyShort || !onCorrectChain || isPending || isConfirming}
             className="mt-4 w-full rounded-lg bg-rh-lime px-4 py-2.5 font-semibold text-rh-bg transition-colors hover:bg-rh-lime-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             Mint {input || "0"} shares

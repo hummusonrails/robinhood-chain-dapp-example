@@ -9,6 +9,7 @@ import {
 } from "wagmi";
 import { stockTokenAbi } from "@/abi/stock-token";
 import { priceFeedAbi } from "@/abi/price-feed";
+import { activeChain } from "@/config/wagmi";
 
 export function useStockTokenSymbol(token: Address) {
   return useReadContract({
@@ -88,6 +89,7 @@ export function useApprove() {
         abi: stockTokenAbi,
         functionName: "approve",
         args: [spender, amount],
+        chainId: activeChain.id,
       });
     },
     hash,
