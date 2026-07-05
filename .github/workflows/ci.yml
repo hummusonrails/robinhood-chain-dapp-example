@@ -25,6 +25,10 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          # pinned to the version the repo is formatted and tested with,
+          # forge fmt output changes between releases
+          version: v1.0.0
 
       - name: Check formatting
         run: forge fmt --check --root contracts
@@ -47,6 +51,10 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          # pinned to the version the repo is formatted and tested with,
+          # forge fmt output changes between releases
+          version: v1.0.0
 
       - name: Fork tests against Robinhood Chain mainnet
         run: forge test --root contracts --match-path 'test/fork/*' -vv
