@@ -85,6 +85,30 @@ export function StepMint() {
   const anyShort =
     !!components.data && components.data.some((_, i) => isShort(i));
 
+  // batch read allowances so the mint button stays locked until every approval lands
+  const allowances = useReadContracts({
+    contracts: (components.data ?? []).map((c) => ({
+      address: c.token,
+      abi: stockTokenAbi,
+      functionName: "allowance" as const,
+      args: [
+        address ?? "0x0000000000000000000000000000000000000000",
+        demoBasketAddress,
+      ] as const,
+    })),
+    query: { enabled: !!address && !!components.data, refetchInterval: 5_000 },
+  });
+  const isApproved = (i: number) => {
+    const allowed = allowances.data?.[i]?.result as bigint | undefined;
+    const need = quote.data?.[i];
+    return allowed !== undefined && need !== undefined && allowed >= need;
+  };
+  const approvedCount = (components.data ?? []).filter((_, i) => isApproved(i)).length;
+  const allApproved =
+    !!components.data &&
+    components.data.length > 0 &&
+    approvedCount === components.data.length;
+
   useEffect(() => {
     if (isConfirmed && hash) {
       queryClient.invalidateQueries();
@@ -97,8 +121,10 @@ export function StepMint() {
     }
   }, [isConfirmed, hash, queryClient, logEvent, shares]);
 
+  const refetchAllowances = allowances.refetch;
   const onApproveConfirmed = useCallback(
     (token: Address, symbol: string, txHash: `0x${string}`) => {
+      refetchAllowances();
       logEvent(`approve-${txHash}`, {
         actor: "wallet",
         title: `approve(basket, amount) · ${symbol}`,
@@ -106,7 +132,7 @@ export function StepMint() {
         payload: JSON.stringify({ token, hash: txHash }, null, 2),
       });
     },
-    [logEvent],
+    [logEvent, refetchAllowances],
   );
 
   const submit = () => {
@@ -203,25 +229,52 @@ export function StepMint() {
           )}
 
           {shares > 0n && !anyShort && onCorrectChain && components.data && quote.data && (
-            <div className="mt-3 space-y-2">
-              {components.data.map((c, i) => (
-                <ApproveRow
-                  key={c.token}
-                  token={c.token}
-                  spender={demoBasketAddress}
-                  required={quote.data[i]}
-                  onConfirmed={onApproveConfirmed}
-                />
-              ))}
+            <div className="mt-4">
+              <div className="flex items-baseline justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-rh-lime">
+                  1 · Approve each Stock Token
+                </p>
+                <p className="font-mono text-xs text-rh-faint">
+                  {approvedCount} of {components.data.length} approved
+                </p>
+              </div>
+              <p className="mt-1 text-xs text-rh-faint">
+                The basket pulls tokens with transferFrom, so each one needs an
+                allowance before minting can work. One wallet confirmation per
+                token.
+              </p>
+              <div className="mt-2 space-y-2">
+                {components.data.map((c, i) => (
+                  <ApproveRow
+                    key={c.token}
+                    token={c.token}
+                    spender={demoBasketAddress}
+                    required={quote.data[i]}
+                    onConfirmed={onApproveConfirmed}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-rh-lime">
+            2 · Mint
+          </p>
           <button
             onClick={submit}
-            disabled={shares === 0n || anyShort || !onCorrectChain || isPending || isConfirming}
-            className="mt-4 w-full rounded-lg bg-rh-lime px-4 py-2.5 font-semibold text-rh-bg transition-colors hover:bg-rh-lime-hover disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={
+              shares === 0n ||
+              anyShort ||
+              !onCorrectChain ||
+              !allApproved ||
+              isPending ||
+              isConfirming
+            }
+            className="mt-2 w-full rounded-lg bg-rh-lime px-4 py-2.5 font-semibold text-rh-bg transition-colors hover:bg-rh-lime-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Mint {input || "0"} shares
+            {!allApproved && shares > 0n && !anyShort
+              ? "Approve all tokens above first"
+              : `Mint ${input || "0"} shares`}
           </button>
           <TxStatus
             hash={hash}
