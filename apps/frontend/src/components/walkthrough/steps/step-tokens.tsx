@@ -33,10 +33,10 @@ export function StepTokens() {
   const balanceUI = useBalanceOfUI(token ?? demoBasketAddress);
 
   useEffect(() => {
-    if (token && name.data && multiplier.data !== undefined) {
+    if (token && name.data && symbol.data && multiplier.data !== undefined) {
       logEvent("step1-token-read", {
         actor: "chain",
-        title: `read ${symbol.data ?? "token"} metadata`,
+        title: `read ${symbol.data} metadata`,
         note: "Plain eth_call reads against the Stock Token contract on testnet.",
         payload: JSON.stringify(
           {
