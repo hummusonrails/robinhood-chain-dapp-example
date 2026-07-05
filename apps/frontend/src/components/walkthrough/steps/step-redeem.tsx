@@ -48,10 +48,8 @@ export function StepRedeem() {
   const { redeem, hash, isPending, isConfirming, isConfirmed, error, reset } =
     useBasketWrite();
 
-  // clear the input on success so the stale amount cannot trip the balance warning
   useEffect(() => {
     if (isConfirmed && hash) {
-      setInput("");
       queryClient.invalidateQueries();
       logEvent(`redeem-${hash}`, {
         actor: "chain",
@@ -113,16 +111,20 @@ export function StepRedeem() {
           <div className="mt-1 flex gap-2">
             <input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                if (isConfirmed) reset();
+                setInput(e.target.value);
+              }}
               inputMode="decimal"
               placeholder="0.0"
               className="w-full rounded-lg border border-rh-border-strong bg-rh-bg px-3 py-2 font-mono text-lg outline-none focus:border-rh-lime"
             />
             <button
-              onClick={() =>
-                balance.data !== undefined &&
-                setInput(formatUnits(balance.data, 18))
-              }
+              onClick={() => {
+                if (balance.data === undefined) return;
+                if (isConfirmed) reset();
+                setInput(formatUnits(balance.data, 18));
+              }}
               disabled={!balance.data}
               className="rounded-lg border border-rh-border-strong px-4 font-mono text-xs text-rh-muted transition-colors hover:border-rh-lime hover:text-rh-lime disabled:opacity-40"
             >
@@ -133,14 +135,14 @@ export function StepRedeem() {
             You hold {formatShares(balance.data)} shares.
           </p>
 
-          {insufficient && (
+          {insufficient && !isConfirmed && (
             <p className="mt-3 rounded-lg border border-rh-danger/50 bg-rh-danger/10 px-3 py-2 text-xs leading-relaxed text-rh-danger">
               That is more than you hold. Mint some shares in step 4 first, then
               come back to redeem them.
             </p>
           )}
 
-          {shares > 0n && components.data && quote.data && (
+          {shares > 0n && !isConfirmed && components.data && quote.data && (
             <div className="mt-3 space-y-2">
               <p className="text-xs uppercase tracking-wide text-rh-faint">
                 You receive
