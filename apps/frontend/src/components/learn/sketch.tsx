@@ -2,13 +2,11 @@ import Image, { type StaticImageData } from "next/image";
 import architecture from "@/generated/diagram-architecture.png";
 import deploy from "@/generated/diagram-deploy.png";
 import gas from "@/generated/diagram-gas.png";
-import sync from "@/generated/diagram-sync.png";
 
 const DIAGRAMS: Record<string, StaticImageData> = {
   architecture,
   deploy,
   gas,
-  sync,
 };
 
 type Props = {

@@ -165,10 +165,10 @@ export function StepMint() {
           under-collateralized.
         </p>
         <p>
-          One subtlety worth teaching: component amounts{" "}
-          <strong className="text-rh-text">round up</strong>. If they rounded down, a
-          dust-sized mint would cost zero of each component and drain the reserves
-          one wei at a time.
+          One subtlety worth savoring: component amounts{" "}
+          <strong className="text-rh-text">round up</strong>, so every mint, even a
+          dust-sized one, pays its full share of the backing and the basket stays
+          fully collateralized.
         </p>
       </div>
 

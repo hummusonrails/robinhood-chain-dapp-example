@@ -75,10 +75,10 @@ export function StepFeeds() {
           the same interface. Everything a consumer contract does is identical.
         </p>
         <p>
-          Equity feeds have a property crypto feeds do not: <strong className="text-rh-text">
-          markets close</strong>. Stock feeds update 24 hours a day but only 5 days a
-          week, so a naive one-hour staleness check would brick every consumer each
-          weekend. The basket accepts a{" "}
+          Equity feeds have a rhythm of their own: <strong className="text-rh-text">
+          markets keep hours</strong>. Stock feeds update 24 hours a day, 5 days a
+          week, so the staleness window belongs to the asset class. Size it for a
+          quiet weekend and pricing sails through Monday open. The basket accepts a{" "}
           <code className="font-mono text-rh-lime">maxPriceAge</code> at deployment
           and this one uses {maxPriceAge.data ? Number(maxPriceAge.data) / 86400 : 4}{" "}
           days.

@@ -46,8 +46,8 @@ export default function LearnPage() {
           shows what the dapp does. This page shows how it is built: the two
           Solidity contracts, the deploy pipeline for Robinhood Chain testnet and
           mainnet, and the places where this chain genuinely differs from the
-          Ethereum L2 playbook you may already know. Every snippet is extracted
-          from the repo at build time and links to the exact lines on GitHub.
+          Ethereum playbook you may already know. Every snippet is real code from
+          the repo and links to the exact lines on GitHub.
         </p>
       </div>
 
@@ -84,10 +84,10 @@ export default function LearnPage() {
           <p>
             <Code>mint</Code> pulls each component with{" "}
             <Code>transferFrom</Code> and issues shares in the same transaction,
-            so the basket cannot exist under-collateralized. The load-bearing
-            detail is the rounding direction: amounts round <strong className="text-rh-text">up</strong>,
-            because rounding down would let a dust-sized mint pay zero of each
-            component and drain reserves one wei at a time.
+            so every share is fully backed from the moment it exists. The
+            load-bearing detail is the rounding direction: amounts round{" "}
+            <strong className="text-rh-text">up</strong>, so even the smallest
+            mint pays its full share of the backing and the reserves stay whole.
           </p>
         </Prose>
         <CodeBlock id="basket-mint" />
@@ -121,9 +121,9 @@ export default function LearnPage() {
         <CodeBlock id="read-price" />
         <Prose>
           <p>
-            The rounding claims above are not vibes, they are a fuzzed invariant.
-            This property test mints and redeems random amounts and asserts a user
-            can lose at most one wei of dust per component, round trip, while the
+            A fuzzed invariant backs the rounding guarantees. This property test
+            mints and redeems random amounts and asserts a user keeps everything
+            except at most one wei of dust per component, round trip, while the
             supply always returns to zero.
           </p>
         </Prose>
@@ -176,10 +176,10 @@ export default function LearnPage() {
         <Prose>
           <p>
             Replay the real sessions below. The testnet recording is the exact
-            deploy that produced the contracts this site reads, and the mainnet
-            tab starts with the rehearsal that makes a mainnet deploy boring:
-            fork tests that run this exact configuration against live mainnet
-            state for free.
+            deploy that produced the contracts this site reads. The mainnet tab
+            starts with the rehearsal: fork tests that run this exact
+            configuration against live mainnet state, free of charge, so the
+            real deploy holds no surprises.
           </p>
         </Prose>
         <DeployTerminals />
@@ -201,9 +201,10 @@ export default function LearnPage() {
       >
         <Prose>
           <p>
-            Robinhood Chain is EVM equivalent, so almost everything you know
-            holds. These five things genuinely differ, and two of them bit this
-            repo during development.
+            Robinhood Chain is EVM equivalent, so almost everything you already
+            know carries over. These five differences are worth learning early,
+            and each one comes with a simple pattern you can build in from day
+            one.
           </p>
         </Prose>
         <Sketch
@@ -217,10 +218,11 @@ export default function LearnPage() {
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
               Your fee is L2 execution plus the cost of posting your calldata to
-              Ethereum, and that second component shifts between estimation and
-              execution. Two of this repo&apos;s feed deployments died at exactly
-              their gas limit before the deploy script learned to send with
-              headroom. This is the fix, in the deploy script every network shares:
+              Ethereum, and that second component can shift a little between
+              estimation and execution. The pattern to adopt: send deployments
+              with generous gas headroom and they land reliably on the first
+              try. Here is how this repo&apos;s deploy script does it for every
+              network:
             </p>
           </div>
           <CodeBlock id="deploy-sh-forge" />
@@ -230,9 +232,11 @@ export default function LearnPage() {
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
               On Arbitrum chains <Code>block.number</Code> returns an estimate of
-              the Ethereum block number. For the chain&apos;s own ~250ms block
-              height, call <Code>ArbSys(address(100)).arbBlockNumber()</Code>.
-              Any time-based logic copied from L1 tutorials needs this check.
+              the Ethereum block number, which is handy for logic anchored to L1
+              time. When you want the chain&apos;s own ~250ms block height,{" "}
+              <Code>ArbSys(address(100)).arbBlockNumber()</Code> has you covered.
+              Knowing which clock you are reading makes time-based logic easy to
+              get right.
             </p>
           </div>
           <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
@@ -240,9 +244,10 @@ export default function LearnPage() {
               3 · first come, first served, no priority auction
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
-              The sequencer orders transactions by arrival time. Tipping more gas
-              does not jump the queue, which removes the classic sandwich-attack
-              economics and makes fee estimation boring in the best way.
+              The sequencer orders transactions by arrival time. Everyone pays
+              the same fair price for the same position in line, sandwich
+              attacks lose their economics, and fee estimation becomes simple
+              and predictable.
             </p>
           </div>
           <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
@@ -250,9 +255,10 @@ export default function LearnPage() {
               4 · contracts can be four times bigger
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
-              The code size limit is 96KB against Ethereum&apos;s 24KB, with
-              192KB of initcode. Patterns you learned for splitting contracts
-              around the Spurious Dragon limit are optional here.
+              A contract can hold up to 96KB of code here, four times
+              Ethereum&apos;s 24KB, with 192KB for constructor code. Features
+              that would need to be split across several contracts on Ethereum
+              can live together in one readable file.
             </p>
           </div>
           <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
@@ -260,11 +266,12 @@ export default function LearnPage() {
               5 · oracles keep market hours
             </p>
             <p className="mt-2 text-sm leading-relaxed text-rh-muted">
-              Equity feeds update 24/5, not 24/7. A one-hour staleness threshold,
-              standard for crypto pairs, bricks every consumer on Saturday. Design
-              staleness per asset class, and never let transfers depend on
-              pricing, which is exactly how <Code>BasketToken</Code> splits its
-              functions.
+              Equity feeds update 24 hours a day, five days a week, matching the
+              markets they track. Two patterns make this a joy to work with:
+              size your staleness window per asset class (this basket uses 4
+              days, so weekends pass without a hiccup), and keep transfers
+              independent of pricing, which is exactly how{" "}
+              <Code>BasketToken</Code> splits its functions.
             </p>
           </div>
         </div>
@@ -311,34 +318,19 @@ export default function LearnPage() {
             </p>
           </div>
           <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
-            <p className="text-sm font-semibold text-rh-text">Stylus is live</p>
+            <p className="text-sm font-semibold text-rh-text">
+              Rust contracts, too
+            </p>
             <p className="mt-1 text-xs leading-relaxed text-rh-muted">
-              The Stylus WASM runtime answers on both networks:{" "}
-              <Code>ArbWasm.stylusVersion()</Code> at precompile{" "}
-              <Code>0x…0071</Code> returns 3. Rust contracts deploy alongside
-              Solidity and interoperate through the same ABI.
+              The chain also runs{" "}
+              <Ext href="https://docs.arbitrum.io/stylus/gentle-introduction">Stylus</Ext>,
+              which lets you write contracts in Rust and deploy them right
+              alongside Solidity ones. Stylus is switched on for both testnet
+              and mainnet, and a Solidity contract can call a Rust one the same
+              way it calls any other contract.
             </p>
           </div>
         </div>
-      </Section>
-
-      {/* sync */}
-      <Section kicker="docs that cannot rot" title="How this page stays honest">
-        <Prose>
-          <p>
-            Every snippet above is extracted from the repo by{" "}
-            <Ext href={`${REPO}/blob/main/scripts/extract-snippets.mjs`}>scripts/extract-snippets.mjs</Ext>{" "}
-            before every build, with line numbers computed at extraction time. A
-            GitHub Action re-runs the extraction on every contract change and
-            commits the refresh, and Vercel redeploys on every push. Change{" "}
-            <Code>mint</Code> tomorrow and this page shows the new code, with
-            correct GitHub links, without anyone touching the frontend.
-          </p>
-        </Prose>
-        <Sketch
-          name="sync"
-          caption="The sync pipeline. Contract edits flow to the deployed site through build-time extraction, so prose and code cannot drift apart."
-        />
       </Section>
 
       {/* cta */}
