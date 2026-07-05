@@ -1,0 +1,114 @@
+{
+  "component-struct": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 20,
+    "endLine": 25,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L20-L25",
+    "code": "struct Component {\n    address token;\n    address feed;\n    // raw token amount backing one basket share\n    uint256 unitsPerShare;\n}"
+  },
+  "basket-constructor": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 54,
+    "endLine": 81,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L54-L81",
+    "code": "constructor(\n    string memory name_,\n    string memory symbol_,\n    Component[] memory components_,\n    uint256 maxPriceAge_\n) ERC20(name_, symbol_) {\n    uint256 count = components_.length;\n    if (count == 0) revert EmptyComponents();\n    if (count > 10) revert TooManyComponents(count);\n\n    for (uint256 i = 0; i < count; i++) {\n        Component memory c = components_[i];\n        if (c.token == address(0) || c.feed == address(0)) revert ZeroAddress();\n        if (c.unitsPerShare == 0) revert ZeroUnits(c.token);\n        if (_tokenDecimals[c.token] != 0) revert DuplicateToken(c.token);\n\n        uint8 feedDecimals = AggregatorV3Interface(c.feed).decimals();\n        if (feedDecimals != USD_DECIMALS) {\n            revert UnexpectedFeedDecimals(c.feed, feedDecimals);\n        }\n\n        _tokenDecimals[c.token] = IERC20Metadata(c.token).decimals();\n        _components.push(c);\n    }\n\n    maxPriceAge = maxPriceAge_;\n    factory = msg.sender;\n}"
+  },
+  "basket-mint": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 83,
+    "endLine": 96,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L83-L96",
+    "code": "// deposit the components and mint shares, amounts round up so minters never underpay\nfunction mint(uint256 shares, address to) external nonReentrant {\n    if (shares == 0) revert ZeroShares();\n\n    uint256 count = _components.length;\n    for (uint256 i = 0; i < count; i++) {\n        Component memory c = _components[i];\n        uint256 amount = Math.mulDiv(c.unitsPerShare, shares, SHARE_UNIT, Math.Rounding.Ceil);\n        IERC20(c.token).safeTransferFrom(msg.sender, address(this), amount);\n    }\n\n    _mint(to, shares);\n    emit Minted(msg.sender, to, shares);\n}"
+  },
+  "basket-redeem": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 98,
+    "endLine": 113,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L98-L113",
+    "code": "// burn shares and withdraw the components, amounts round down so reserves never overdraw\nfunction redeem(uint256 shares, address to) external nonReentrant {\n    if (shares == 0) revert ZeroShares();\n    if (to == address(0)) revert ZeroAddress();\n\n    _burn(msg.sender, shares);\n\n    uint256 count = _components.length;\n    for (uint256 i = 0; i < count; i++) {\n        Component memory c = _components[i];\n        uint256 amount = Math.mulDiv(c.unitsPerShare, shares, SHARE_UNIT, Math.Rounding.Floor);\n        IERC20(c.token).safeTransfer(to, amount);\n    }\n\n    emit Redeemed(msg.sender, to, shares);\n}"
+  },
+  "share-price": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 133,
+    "endLine": 142,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L133-L142",
+    "code": "// usd value of one share with 8 decimals\n// feeds price the raw stock token with corporate actions applied so no uiMultiplier here\nfunction sharePriceUsd() public view returns (uint256 price) {\n    uint256 count = _components.length;\n    for (uint256 i = 0; i < count; i++) {\n        Component memory c = _components[i];\n        uint256 tokenPrice = _readPrice(c.feed);\n        price += Math.mulDiv(tokenPrice, c.unitsPerShare, 10 ** _tokenDecimals[c.token]);\n    }\n}"
+  },
+  "read-price": {
+    "file": "contracts/src/BasketToken.sol",
+    "startLine": 164,
+    "endLine": 169,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketToken.sol#L164-L169",
+    "code": "function _readPrice(address feed) private view returns (uint256) {\n    (, int256 answer,, uint256 updatedAt,) = AggregatorV3Interface(feed).latestRoundData();\n    if (answer <= 0) revert InvalidPrice(feed, answer);\n    if (block.timestamp > updatedAt + maxPriceAge) revert StalePrice(feed, updatedAt);\n    return uint256(answer);\n}"
+  },
+  "factory-create": {
+    "file": "contracts/src/BasketFactory.sol",
+    "startLine": 16,
+    "endLine": 27,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/BasketFactory.sol#L16-L27",
+    "code": "// deploys a new basket token and registers it\nfunction createBasket(\n    string calldata name,\n    string calldata symbol,\n    BasketToken.Component[] calldata components,\n    uint256 maxPriceAge\n) external returns (address basket) {\n    basket = address(new BasketToken(name, symbol, components, maxPriceAge));\n    _baskets.push(basket);\n    isBasket[basket] = true;\n    emit BasketCreated(basket, msg.sender, name, symbol);\n}"
+  },
+  "erc8056-interface": {
+    "file": "contracts/src/interfaces/IScaledUIAmount.sol",
+    "startLine": 4,
+    "endLine": 20,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/src/interfaces/IScaledUIAmount.sol#L4-L20",
+    "code": "// erc-8056 scaled ui amount extension implemented by robinhood chain stock tokens\n// raw balances never rebase, splits apply through the multiplier instead\n// underlying shares = raw balance * uiMultiplier / 1e18\n// docs: https://docs.robinhood.com/chain/stock-tokens/\ninterface IScaledUIAmount {\n    // 18 decimal fixed point where 1e18 equals 1.0\n    function uiMultiplier() external view returns (uint256);\n\n    function balanceOfUI(address account) external view returns (uint256);\n\n    function totalSupplyUI() external view returns (uint256);\n\n    // pending multiplier that activates at effectiveAt\n    function newUIMultiplier() external view returns (uint256);\n\n    function effectiveAt() external view returns (uint256);\n}"
+  },
+  "fork-setup": {
+    "file": "contracts/test/fork/BasketMainnetFork.t.sol",
+    "startLine": 32,
+    "endLine": 44,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/test/fork/BasketMainnetFork.t.sol#L32-L44",
+    "code": "function setUp() public {\n    string memory rpc =\n        vm.envOr(\"ROBINHOOD_RPC_URL\", string(\"https://rpc.mainnet.chain.robinhood.com\"));\n    vm.createSelectFork(rpc);\n    assertEq(block.chainid, 4663);\n\n    factory = new BasketFactory();\n    BasketToken.Component[] memory c = new BasketToken.Component[](3);\n    c[0] = BasketToken.Component(TSLA, TSLA_FEED, 0.4e18);\n    c[1] = BasketToken.Component(NVDA, NVDA_FEED, 0.3e18);\n    c[2] = BasketToken.Component(AAPL, AAPL_FEED, 0.3e18);\n    basket = BasketToken(factory.createBasket(\"Tech Trio\", \"TRIO\", c, MAX_PRICE_AGE));\n}"
+  },
+  "fork-mint": {
+    "file": "contracts/test/fork/BasketMainnetFork.t.sol",
+    "startLine": 67,
+    "endLine": 85,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/test/fork/BasketMainnetFork.t.sol#L67-L85",
+    "code": "function test_mintAndRedeem_withRealStockTokens() public {\n    deal(TSLA, alice, 1e18);\n    deal(NVDA, alice, 1e18);\n    deal(AAPL, alice, 1e18);\n\n    vm.startPrank(alice);\n    IERC20Metadata(TSLA).approve(address(basket), type(uint256).max);\n    IERC20Metadata(NVDA).approve(address(basket), type(uint256).max);\n    IERC20Metadata(AAPL).approve(address(basket), type(uint256).max);\n\n    basket.mint(2e18, alice);\n    assertEq(basket.balanceOf(alice), 2e18);\n    assertEq(IERC20Metadata(TSLA).balanceOf(address(basket)), 0.8e18);\n\n    basket.redeem(2e18, alice);\n    assertEq(basket.totalSupply(), 0);\n    assertEq(IERC20Metadata(TSLA).balanceOf(alice), 1e18);\n    vm.stopPrank();\n}"
+  },
+  "deploy-run": {
+    "file": "contracts/script/Deploy.s.sol",
+    "startLine": 40,
+    "endLine": 60,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/script/Deploy.s.sol#L40-L60",
+    "code": "function run() external {\n    vm.startBroadcast();\n\n    BasketFactory factory = new BasketFactory();\n    console2.log(\"FACTORY=%s\", address(factory));\n\n    BasketToken.Component[] memory components;\n    if (block.chainid == 4663) {\n        components = _mainnetComponents();\n    } else if (block.chainid == 46630) {\n        components = _testnetComponents();\n    } else {\n        components = _localComponents();\n    }\n\n    address basket = factory.createBasket(\"Tech Trio\", \"TRIO\", components, MAX_PRICE_AGE);\n    console2.log(\"DEMO_BASKET=%s\", basket);\n    console2.log(\"CHAIN_ID=%s\", block.chainid);\n\n    vm.stopBroadcast();\n}"
+  },
+  "deploy-mainnet": {
+    "file": "contracts/script/Deploy.s.sol",
+    "startLine": 62,
+    "endLine": 67,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/script/Deploy.s.sol#L62-L67",
+    "code": "function _mainnetComponents() internal pure returns (BasketToken.Component[] memory c) {\n    c = new BasketToken.Component[](3);\n    c[0] = BasketToken.Component(MAINNET_TSLA, MAINNET_TSLA_FEED, 0.4e18);\n    c[1] = BasketToken.Component(MAINNET_NVDA, MAINNET_NVDA_FEED, 0.3e18);\n    c[2] = BasketToken.Component(MAINNET_AAPL, MAINNET_AAPL_FEED, 0.3e18);\n}"
+  },
+  "deploy-testnet": {
+    "file": "contracts/script/Deploy.s.sol",
+    "startLine": 69,
+    "endLine": 82,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/script/Deploy.s.sol#L69-L82",
+    "code": "function _testnetComponents() internal returns (BasketToken.Component[] memory c) {\n    // demo prices, real chainlink feeds exist on mainnet only\n    MockPriceFeed tslaFeed = new MockPriceFeed(8, \"RHTSLA / USD\", 400e8);\n    MockPriceFeed amznFeed = new MockPriceFeed(8, \"RHAMZN / USD\", 230e8);\n    MockPriceFeed nflxFeed = new MockPriceFeed(8, \"RHNFLX / USD\", 120e8);\n    console2.log(\"TSLA_FEED=%s\", address(tslaFeed));\n    console2.log(\"AMZN_FEED=%s\", address(amznFeed));\n    console2.log(\"NFLX_FEED=%s\", address(nflxFeed));\n\n    c = new BasketToken.Component[](3);\n    c[0] = BasketToken.Component(TESTNET_TSLA, address(tslaFeed), 0.4e18);\n    c[1] = BasketToken.Component(TESTNET_AMZN, address(amznFeed), 0.3e18);\n    c[2] = BasketToken.Component(TESTNET_NFLX, address(nflxFeed), 0.3e18);\n}"
+  },
+  "deploy-sh-forge": {
+    "file": "scripts/deploy.sh",
+    "startLine": 80,
+    "endLine": 90,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/scripts/deploy.sh#L80-L90",
+    "code": "# gas estimates on arbitrum stack chains include an l1 data fee component that\n# moves between estimation and execution, extra headroom prevents out of gas\n# --slow waits for each receipt so later txs never race earlier deployments\nOUTPUT=$(cd \"$ROOT/contracts\" && forge script script/Deploy.s.sol:Deploy \\\n    --rpc-url \"$RPC_URL\" \\\n    --private-key \"$PRIVATE_KEY\" \\\n    --broadcast \\\n    --slow \\\n    --gas-estimate-multiplier 300 \\\n    ${VERIFY_ARGS[@]+\"${VERIFY_ARGS[@]}\"} 2>&1) || {\n    echo \"$OUTPUT\" >&2"
+  },
+  "deploy-sh-verify": {
+    "file": "scripts/deploy.sh",
+    "startLine": 37,
+    "endLine": 41,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/scripts/deploy.sh#L37-L41",
+    "code": "testnet)\n    RPC_URL=\"${RPC_URL:-https://rpc.testnet.chain.robinhood.com}\"\n    CHAIN_ID=46630\n    VERIFIER_URL=\"https://explorer.testnet.chain.robinhood.com/api/\"\n    ;;"
+  },
+  "fuzz-roundtrip": {
+    "file": "contracts/test/BasketToken.t.sol",
+    "startLine": 293,
+    "endLine": 305,
+    "github": "https://github.com/hummusonrails/robinhood-chain-dapp-example/blob/main/contracts/test/BasketToken.t.sol#L293-L305",
+    "code": "function testFuzz_mintRedeemRoundTrip(uint96 rawShares) public {\n    uint256 shares = bound(uint256(rawShares), 1, 50e18);\n    vm.startPrank(alice);\n    basket.mint(shares, alice);\n    basket.redeem(shares, alice);\n    vm.stopPrank();\n\n    // user can lose at most 1 wei of dust per component to rounding\n    assertGe(tsla.balanceOf(alice) + 1, 100e18);\n    assertGe(amzn.balanceOf(alice) + 1, 100e18);\n    assertLe(tsla.balanceOf(alice), 100e18);\n    assertEq(basket.totalSupply(), 0);\n}"
+  }
+}

@@ -1,0 +1,6 @@
+flowchart LR
+    wallet["Your wallet"] -- "approve + mint(shares, to)" --> basket["BasketToken<br/>Tech Trio (TRIO)"]
+    factory["BasketFactory"] -- "createBasket() deploys" --> basket
+    basket -- "transferFrom / transfer" --> tokens["Stock Tokens<br/>TSLA · AMZN · NFLX"]
+    basket -. "latestRoundData()" .-> feeds["Chainlink<br/>USD feeds"]
+    basket -- "redeem(shares, to)" --> wallet

@@ -1,0 +1,7 @@
+flowchart LR
+    change["contracts/src edit"] --> push["git push main"]
+    push --> action["frontend-sync.yml<br/>re-extracts snippets"]
+    push --> vercel["Vercel build"]
+    action -- "commits drift if any" --> push
+    vercel --> extract["extract-snippets.mjs<br/>runs before next build"]
+    extract --> site["learn page shows<br/>current code + line links"]

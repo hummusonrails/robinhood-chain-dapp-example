@@ -1,0 +1,11 @@
+flowchart TD
+    sh["scripts/deploy.sh<br/>--slow · gas estimate x3"] --> forge["forge script Deploy.s.sol<br/>--broadcast"]
+    forge --> which{"block.chainid?"}
+    which -- "31337 anvil" --> local["mock Stock Tokens<br/>+ mock feeds"]
+    which -- "46630 testnet" --> testnet["real faucet Stock Tokens<br/>+ mock feeds"]
+    which -- "4663 mainnet" --> mainnet["real Stock Tokens<br/>+ real Chainlink feeds"]
+    local --> out["BasketFactory + Tech Trio basket"]
+    testnet --> out
+    mainnet --> out
+    out --> verify["Blockscout verification"]
+    verify --> env["writes apps/frontend/.env.local"]

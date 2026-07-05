@@ -24,7 +24,8 @@
 - **Redeems shares** back into the underlying tokens at any time, with rounding that always favors the basket reserves
 - **Prices baskets in USD live** by summing Chainlink price feeds for each component, the same feeds Robinhood Chain publishes for every Stock Token
 - **Demonstrates ERC-8056**, the Scaled UI Amount extension Stock Tokens use to handle stock splits without rebasing balances
-- **Ships a full frontend** in the Robinhood Chain design language with wallet connection, approvals, minting, redeeming, and live pricing
+- **Ships a full frontend** in the Robinhood Chain design language: a five step interactive walkthrough with a live onchain console, plus a [developer deep dive](https://robinhood-chain-dapp.vercel.app/learn) with hand drawn diagrams, replayable deploy terminals, and code tours
+- **Keeps docs honest automatically**: every code snippet on the deep dive page is extracted from the contracts before each build with exact GitHub line links, and a sync workflow refreshes them on every contract change
 
 ## Quick Start
 
@@ -292,6 +293,8 @@ Equity feeds update 24/5, matching the tokenized stock trading schedule. A naive
 | `pnpm run build:frontend` | Frontend production build |
 | `pnpm run lint:frontend` | Frontend eslint |
 | `pnpm run check` | Build contracts, run unit tests, build frontend |
+| `node scripts/extract-snippets.mjs` | Regenerate the deep dive code snippets from the contracts |
+| `scripts/generate-diagrams.sh` | Rerender the hand drawn diagrams (needs `mmdc` and `resvg`) |
 
 ## Contributing
 

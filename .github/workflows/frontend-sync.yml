@@ -1,0 +1,47 @@
+name: Frontend sync
+
+# keeps the learn page snippets in lockstep with the contracts
+# the extraction also runs inside every vercel build, so the deployed site is
+# always current even before this workflow lands its refresh commit
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/src/**"
+      - "contracts/test/**"
+      - "contracts/script/**"
+      - "scripts/deploy.sh"
+      - "scripts/extract-snippets.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontend-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Extract snippets from contracts
+        run: node scripts/extract-snippets.mjs
+
+      - name: Commit refresh if the generated snippets changed
+        run: |
+          if git diff --quiet apps/frontend/src/generated/snippets.json; then
+            echo "snippets already in sync"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/frontend/src/generated/snippets.json
+          git commit -m "Sync learn page snippets with contract changes"
+          git push

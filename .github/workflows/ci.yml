@@ -69,6 +69,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify snippet anchors resolve against the contracts
+        run: node scripts/extract-snippets.mjs
+
       - name: Lint
         run: pnpm run lint:frontend
 

@@ -27,3 +27,29 @@ body {
   background: var(--color-rh-lime);
   color: var(--color-rh-bg);
 }
+
+/* shiki output on the learn page, line numbers continue from the real file */
+.learn-code pre {
+  background: transparent !important;
+}
+
+.learn-code code {
+  display: block;
+  font-family: var(--font-mono);
+}
+
+.learn-code .line {
+  display: inline-block;
+  width: 100%;
+}
+
+.learn-code .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 3rem;
+  padding-right: 1rem;
+  text-align: right;
+  color: var(--color-rh-border-strong);
+  user-select: none;
+}

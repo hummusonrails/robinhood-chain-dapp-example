@@ -3,10 +3,16 @@ const REPO_URL = "https://github.com/hummusonrails/robinhood-chain-dapp-example"
 export function SiteFooter() {
   return (
     <footer className="border-t border-rh-border bg-rh-surface">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
         <p className="text-sm text-rh-muted">
           made with <span aria-label="love">❤️</span> by the Arbitrum DevRel Team
         </p>
+        <a
+          href="/learn"
+          className="mr-auto hidden font-mono text-xs text-rh-faint transition-colors hover:text-rh-lime sm:block"
+        >
+          developer deep dive →
+        </a>
         <a
           href={REPO_URL}
           target="_blank"

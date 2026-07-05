@@ -202,6 +202,21 @@ export function StepRedeem() {
           to deploy your own basket, change the composition, or break the rounding
           on purpose and watch the fuzz tests catch it.
         </p>
+        <a
+          href="/learn"
+          className="mt-4 flex items-center justify-between rounded-lg border border-rh-lime/50 bg-rh-lime/5 px-4 py-3 transition-colors hover:bg-rh-lime/15"
+        >
+          <span>
+            <span className="block font-mono text-xs uppercase tracking-widest text-rh-lime">
+              Keep going
+            </span>
+            <span className="mt-0.5 block text-sm font-semibold text-rh-text">
+              Developer deep dive: the contracts, deploying on Robinhood Chain,
+              and what the Arbitrum stack changes
+            </span>
+          </span>
+          <span className="ml-3 shrink-0 font-mono text-lg text-rh-lime">→</span>
+        </a>
       </div>
     </StepShell>
   );

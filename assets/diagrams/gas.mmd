@@ -1,0 +1,6 @@
+flowchart TD
+    tx["your transaction"] -.- fee["fee = L2 execution gas + L1 data fee"]
+    tx --> seq["sequencer<br/>first come, first served"]
+    seq --> block["Robinhood Chain block<br/>~250ms"]
+    block --> batch["compressed batch"]
+    batch --> eth["Ethereum blob<br/>settlement + data availability"]
