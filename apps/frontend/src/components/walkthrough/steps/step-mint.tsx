@@ -3,14 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseUnits, type Address } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
 import {
   useBasketBalance,
   useBasketComponents,
   useBasketWrite,
   useQuoteMint,
 } from "@/hooks/use-basket";
-import { useStockTokenBalance, useStockTokenSymbol } from "@/hooks/use-stock-token";
+import { useStockTokenSymbol } from "@/hooks/use-stock-token";
+import { stockTokenAbi } from "@/abi/stock-token";
 import { demoBasketAddress } from "@/config/contracts";
 import { formatShares } from "@/lib/format";
 import { ApproveRow } from "@/components/approve-row";
@@ -29,12 +30,23 @@ export function toShares(input: string): bigint {
   }
 }
 
-function BalanceChip({ token }: { token: Address }) {
+function BalanceChip({
+  token,
+  balance,
+  short,
+}: {
+  token: Address;
+  balance: bigint | undefined;
+  short: boolean;
+}) {
   const symbol = useStockTokenSymbol(token);
-  const balance = useStockTokenBalance(token);
   return (
-    <span className="rounded-md bg-rh-elevated px-2 py-1 font-mono text-xs text-rh-muted">
-      {symbol.data ?? "…"}: {formatShares(balance.data)}
+    <span
+      className={`rounded-md px-2 py-1 font-mono text-xs ${
+        short ? "bg-rh-danger/15 text-rh-danger" : "bg-rh-elevated text-rh-muted"
+      }`}
+    >
+      {symbol.data ?? "…"}: {formatShares(balance)}
     </span>
   );
 }
@@ -51,6 +63,25 @@ export function StepMint() {
   const basketBalance = useBasketBalance(demoBasketAddress);
   const { mint, hash, isPending, isConfirming, isConfirmed, error, reset } =
     useBasketWrite();
+
+  // batch read every component balance so minting can be gated before the wallet
+  const balances = useReadContracts({
+    contracts: (components.data ?? []).map((c) => ({
+      address: c.token,
+      abi: stockTokenAbi,
+      functionName: "balanceOf" as const,
+      args: [address ?? "0x0000000000000000000000000000000000000000"] as const,
+    })),
+    query: { enabled: !!address && !!components.data, refetchInterval: 15_000 },
+  });
+  const balanceOf = (i: number) => balances.data?.[i]?.result as bigint | undefined;
+  const isShort = (i: number) => {
+    const bal = balanceOf(i);
+    const need = quote.data?.[i];
+    return bal !== undefined && need !== undefined && bal < need;
+  };
+  const anyShort =
+    !!components.data && components.data.some((_, i) => isShort(i));
 
   useEffect(() => {
     if (isConfirmed && hash) {
@@ -132,7 +163,14 @@ export function StepMint() {
       ) : (
         <div className="rounded-xl border border-rh-border bg-rh-surface p-4">
           <div className="flex flex-wrap gap-2">
-            {components.data?.map((c) => <BalanceChip key={c.token} token={c.token} />)}
+            {components.data?.map((c, i) => (
+              <BalanceChip
+                key={c.token}
+                token={c.token}
+                balance={balanceOf(i)}
+                short={isShort(i)}
+              />
+            ))}
           </div>
 
           <label className="mt-4 block text-xs uppercase tracking-wide text-rh-faint">
@@ -145,7 +183,23 @@ export function StepMint() {
             className="mt-1 w-full rounded-lg border border-rh-border-strong bg-rh-bg px-3 py-2 font-mono text-lg outline-none focus:border-rh-lime"
           />
 
-          {shares > 0n && components.data && quote.data && (
+          {anyShort && (
+            <p className="mt-3 rounded-lg border border-rh-danger/50 bg-rh-danger/10 px-3 py-2 text-xs leading-relaxed text-rh-danger">
+              Your wallet does not hold enough of the highlighted Stock Tokens for
+              this mint. Claim free testnet Stock Tokens from the{" "}
+              <a
+                href={FAUCET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                official faucet
+              </a>{" "}
+              (5 units of each per day), or lower the share amount.
+            </p>
+          )}
+
+          {shares > 0n && !anyShort && components.data && quote.data && (
             <div className="mt-3 space-y-2">
               {components.data.map((c, i) => (
                 <ApproveRow
@@ -161,7 +215,7 @@ export function StepMint() {
 
           <button
             onClick={submit}
-            disabled={shares === 0n || isPending || isConfirming}
+            disabled={shares === 0n || anyShort || isPending || isConfirming}
             className="mt-4 w-full rounded-lg bg-rh-lime px-4 py-2.5 font-semibold text-rh-bg transition-colors hover:bg-rh-lime-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             Mint {input || "0"} shares

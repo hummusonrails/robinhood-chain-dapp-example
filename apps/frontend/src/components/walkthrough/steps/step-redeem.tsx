@@ -41,6 +41,8 @@ export function StepRedeem() {
   const components = useBasketComponents(demoBasketAddress);
   const balance = useBasketBalance(demoBasketAddress);
   const quote = useQuoteRedeem(demoBasketAddress, shares);
+  const insufficient =
+    balance.data !== undefined && shares > 0n && shares > balance.data;
   const { redeem, hash, isPending, isConfirming, isConfirmed, error, reset } =
     useBasketWrite();
 
@@ -113,6 +115,13 @@ export function StepRedeem() {
             You hold {formatShares(balance.data)} shares.
           </p>
 
+          {insufficient && (
+            <p className="mt-3 rounded-lg border border-rh-danger/50 bg-rh-danger/10 px-3 py-2 text-xs leading-relaxed text-rh-danger">
+              That is more than you hold. Mint some shares in step 4 first, then
+              come back to redeem them.
+            </p>
+          )}
+
           {shares > 0n && components.data && quote.data && (
             <div className="mt-3 space-y-2">
               <p className="text-xs uppercase tracking-wide text-rh-faint">
@@ -126,7 +135,7 @@ export function StepRedeem() {
 
           <button
             onClick={submit}
-            disabled={shares === 0n || isPending || isConfirming}
+            disabled={shares === 0n || insufficient || isPending || isConfirming}
             className="mt-4 w-full rounded-lg bg-rh-lime px-4 py-2.5 font-semibold text-rh-bg transition-colors hover:bg-rh-lime-hover disabled:cursor-not-allowed disabled:opacity-40"
           >
             Redeem {input || "0"} shares
