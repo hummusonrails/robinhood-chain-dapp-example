@@ -14,7 +14,7 @@
 <p align="center">
   <strong>Onchain index baskets of tokenized stocks on Robinhood Chain, minted and redeemed against real Stock Tokens and priced live by Chainlink feeds.</strong>
   <br>
-  <a href="#quick-start">Quick Start</a> · <a href="#local-development">Local Development</a> · <a href="#robinhood-chain-cheat-sheet">Chain Cheat Sheet</a> · <a href="https://github.com/hummusonrails/robinhood-chain-dapp-example/issues">Report a Bug</a>
+  <a href="https://robinhood-chain-dapp.vercel.app">Live Demo</a> · <a href="#quick-start">Quick Start</a> · <a href="#local-development">Local Development</a> · <a href="#robinhood-chain-cheat-sheet">Chain Cheat Sheet</a> · <a href="https://github.com/hummusonrails/robinhood-chain-dapp-example/issues">Report a Bug</a>
 </p>
 
 ## What It Does
@@ -111,6 +111,13 @@ PRIVATE_KEY=$YOUR_TESTNET_KEY pnpm run deploy:testnet
 ```
 
 The testnet deploy composes the demo basket from the **real faucet Stock Tokens** (TSLA, AMZN, NFLX) but deploys **mock Chainlink feeds**, because Chainlink feeds exist on Robinhood Chain mainnet only. Contracts are verified on the testnet Blockscout automatically.
+
+A reference deployment backs the [live demo](https://robinhood-chain-dapp.vercel.app):
+
+| Contract | Address |
+|:---------|:--------|
+| `BasketFactory` | [`0xC1940D5fd58ce735A44a53f910852B12250F6a14`](https://explorer.testnet.chain.robinhood.com/address/0xC1940D5fd58ce735A44a53f910852B12250F6a14) |
+| `BasketToken` (Tech Trio demo) | [`0x7633e0920Ea46A8Ec54F61C95adECD391c01Edd4`](https://explorer.testnet.chain.robinhood.com/address/0x7633e0920Ea46A8Ec54F61C95adECD391c01Edd4) |
 
 ### Mainnet
 

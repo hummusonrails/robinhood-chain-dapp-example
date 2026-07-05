@@ -77,10 +77,15 @@ if [[ -n "$VERIFIER_URL" && "${VERIFY:-1}" == "1" ]]; then
     VERIFY_ARGS=(--verify --verifier blockscout --verifier-url "$VERIFIER_URL")
 fi
 
+# gas estimates on arbitrum stack chains include an l1 data fee component that
+# moves between estimation and execution, extra headroom prevents out of gas
+# --slow waits for each receipt so later txs never race earlier deployments
 OUTPUT=$(cd "$ROOT/contracts" && forge script script/Deploy.s.sol:Deploy \
     --rpc-url "$RPC_URL" \
     --private-key "$PRIVATE_KEY" \
     --broadcast \
+    --slow \
+    --gas-estimate-multiplier 300 \
     ${VERIFY_ARGS[@]+"${VERIFY_ARGS[@]}"} 2>&1) || {
     echo "$OUTPUT" >&2
     exit 1
