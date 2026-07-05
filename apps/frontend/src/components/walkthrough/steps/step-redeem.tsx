@@ -48,17 +48,19 @@ export function StepRedeem() {
   const { redeem, hash, isPending, isConfirming, isConfirmed, error, reset } =
     useBasketWrite();
 
+  // clear the input on success so the stale amount cannot trip the balance warning
   useEffect(() => {
     if (isConfirmed && hash) {
+      setInput("");
       queryClient.invalidateQueries();
       logEvent(`redeem-${hash}`, {
         actor: "chain",
         title: "Redeemed(sender, to, shares)",
         note: "Shares burned, every component transferred back to your wallet.",
-        payload: JSON.stringify({ hash, shares: shares.toString() }, null, 2),
+        payload: JSON.stringify({ hash }, null, 2),
       });
     }
-  }, [isConfirmed, hash, queryClient, logEvent, shares]);
+  }, [isConfirmed, hash, queryClient, logEvent]);
 
   const submit = () => {
     if (!address || shares === 0n) return;
@@ -156,6 +158,18 @@ export function StepRedeem() {
           >
             Redeem {input || "0"} shares
           </button>
+          {isConfirmed && (
+            <div className="mt-3 rounded-lg border border-rh-lime/40 bg-rh-lime/10 px-3 py-3">
+              <p className="text-sm font-semibold text-rh-lime">
+                Redeemed ✓ full lifecycle complete
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-rh-muted">
+                Your shares were burned and every Stock Token is back in your
+                wallet. You have now done everything this basket can do: compose,
+                price, mint, and unwind, all onchain.
+              </p>
+            </div>
+          )}
           <TxStatus
             hash={hash}
             isPending={isPending}

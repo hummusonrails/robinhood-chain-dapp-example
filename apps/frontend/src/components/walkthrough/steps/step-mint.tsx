@@ -276,6 +276,16 @@ export function StepMint() {
               ? "Approve all tokens above first"
               : `Mint ${input || "0"} shares`}
           </button>
+          {isConfirmed && (
+            <div className="mt-3 rounded-lg border border-rh-lime/40 bg-rh-lime/10 px-3 py-3">
+              <p className="text-sm font-semibold text-rh-lime">Minted ✓</p>
+              <p className="mt-1 text-xs leading-relaxed text-rh-muted">
+                The basket pulled your Stock Tokens and issued shares in one
+                transaction. Head to step 5 to unwind them back into the
+                underlying tokens.
+              </p>
+            </div>
+          )}
           <TxStatus
             hash={hash}
             isPending={isPending}
