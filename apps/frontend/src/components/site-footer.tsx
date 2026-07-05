@@ -1,4 +1,4 @@
-const REPO_URL = "https://github.com/hummusonrails/robinhood-chain-dapp";
+const REPO_URL = "https://github.com/hummusonrails/robinhood-chain-dapp-example";
 
 export function SiteFooter() {
   return (

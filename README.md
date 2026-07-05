@@ -8,13 +8,13 @@
   <img src="https://img.shields.io/badge/foundry-forge-CCFF00.svg?style=flat-square" alt="Foundry">
   <img src="https://img.shields.io/badge/openzeppelin-5.4.0-4E5EE4.svg?style=flat-square" alt="OpenZeppelin 5.4.0">
   <img src="https://img.shields.io/badge/next.js-16-black.svg?style=flat-square&logo=next.js" alt="Next.js 16">
-  <a href="https://github.com/hummusonrails/robinhood-chain-dapp/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
+  <a href="https://github.com/hummusonrails/robinhood-chain-dapp-example/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
 </p>
 
 <p align="center">
   <strong>Onchain index baskets of tokenized stocks on Robinhood Chain, minted and redeemed against real Stock Tokens and priced live by Chainlink feeds.</strong>
   <br>
-  <a href="#quick-start">Quick Start</a> · <a href="#local-development">Local Development</a> · <a href="#robinhood-chain-cheat-sheet">Chain Cheat Sheet</a> · <a href="https://github.com/hummusonrails/robinhood-chain-dapp/issues">Report a Bug</a>
+  <a href="#quick-start">Quick Start</a> · <a href="#local-development">Local Development</a> · <a href="#robinhood-chain-cheat-sheet">Chain Cheat Sheet</a> · <a href="https://github.com/hummusonrails/robinhood-chain-dapp-example/issues">Report a Bug</a>
 </p>
 
 ## What It Does
@@ -29,8 +29,8 @@
 ## Quick Start
 
 ```bash
-git clone --recurse-submodules https://github.com/hummusonrails/robinhood-chain-dapp.git
-cd robinhood-chain-dapp
+git clone --recurse-submodules https://github.com/hummusonrails/robinhood-chain-dapp-example.git
+cd robinhood-chain-dapp-example
 pnpm install                # install workspace dependencies
 anvil                       # terminal 1: local chain
 pnpm run deploy:local       # terminal 2: deploy factory, mocks, and demo basket
@@ -157,7 +157,7 @@ pnpm run lint:frontend      # eslint
 ## Project Structure
 
 ```
-robinhood-chain-dapp/
+robinhood-chain-dapp-example/
 ├── contracts/
 │   ├── src/
 │   │   ├── BasketFactory.sol          # permissionless basket deployment and registry
@@ -288,7 +288,7 @@ Equity feeds update 24/5, matching the tokenized stock trading schedule. A naive
 
 ## Contributing
 
-Issues and pull requests are welcome. Open an [issue](https://github.com/hummusonrails/robinhood-chain-dapp/issues) to discuss larger changes first.
+Issues and pull requests are welcome. Open an [issue](https://github.com/hummusonrails/robinhood-chain-dapp-example/issues) to discuss larger changes first.
 
 ## License
 
